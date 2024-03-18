@@ -1,0 +1,359 @@
+{/* <tr>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 w-10 h-10">
+                          <img
+                            className="w-full h-full rounded-full"
+                            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.2&w=160&h=160&q=80"
+                            alt
+                          />
+                        </div>
+                        <div className="ml-3">
+                          <p className="text-gray-900 whitespace-no-wrap">
+                            Blake Bowman
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p className="text-gray-900 whitespace-no-wrap">Editor</p>
+                    </td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p className="text-gray-900 whitespace-no-wrap">
+                        Jan 01, 2020
+                      </p>
+                    </td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <span className="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+                        <span
+                          aria-hidden
+                          className="absolute inset-0 bg-green-200 opacity-50 rounded-full"
+                        />
+                        <span className="relative">Activo</span>
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 w-10 h-10">
+                          <img
+                            className="w-full h-full rounded-full"
+                            src="https://images.unsplash.com/photo-1540845511934-7721dd7adec3?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.2&w=160&h=160&q=80"
+                            alt
+                          />
+                        </div>
+                        <div className="ml-3">
+                          <p className="text-gray-900 whitespace-no-wrap">
+                            Dana Moore
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p className="text-gray-900 whitespace-no-wrap">Editor</p>
+                    </td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <p className="text-gray-900 whitespace-no-wrap">
+                        Jan 10, 2020
+                      </p>
+                    </td>
+                    <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                      <span className="relative inline-block px-3 py-1 font-semibold text-orange-900 leading-tight">
+                        <span
+                          aria-hidden
+                          className="absolute inset-0 bg-orange-200 opacity-50 rounded-full"
+                        />
+                        <span className="relative">Suspended</span>
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-5 py-5 bg-white text-sm">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 w-10 h-10">
+                          <img
+                            className="w-full h-full rounded-full"
+                            src="https://images.unsplash.com/photo-1522609925277-66fea332c575?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.2&h=160&w=160&q=80"
+                            alt
+                          />
+                        </div>
+                        <div className="ml-3">
+                          <p className="text-gray-900 whitespace-no-wrap">
+                            Alonzo Cox
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-5 bg-white text-sm">
+                      <p className="text-gray-900 whitespace-no-wrap">Admin</p>
+                    </td>
+                    <td className="px-5 py-5 bg-white text-sm">
+                      <p className="text-gray-900 whitespace-no-wrap">
+                        Jan 18, 2020
+                      </p>
+                    </td>
+                    <td className="px-5 py-5 bg-white text-sm">
+                      <span className="relative inline-block px-3 py-1 font-semibold text-red-900 leading-tight">
+                        <span
+                          aria-hidden
+                          className="absolute inset-0 bg-red-200 opacity-50 rounded-full"
+                        />
+                        <span className="relative">Inactive</span>
+                      </span>
+                    </td>
+                  </tr> */}
+
+                  ///// import React, { useState } from "react";
+import { storage } from "../../config/firebase";
+import { Button } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
+
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import axios from "axios";
+export default function Category() {
+  const [fileList, setFileList] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [selectedMedia, setSelectedMedia] = useState(null);
+  const changeImage = (event) => {
+    setSelectedMedia(event.target.files[0]);
+    // xem trước media
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      setPreview(event.target.result);
+    };
+    reader.readAsDataURL(file);
+  };
+  const handleAddProduct = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedMedia);
+      formData.append("upload_preset", "project");
+      const [uploadMedia] = await Promise.all([
+        axios.post(
+          "https://api.cloudinary.com/v1_1/df2dkudau/image/upload",
+          formData
+        ),
+      ]);
+      const media = uploadMedia.data.secure_url;
+      console.log(media);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  return (
+    <>
+      {" "}
+      <div className="flex flex-1  flex-col md:flex-row lg:flex-row mx-2">
+        <div className="mb-2 border-solid border-gray-300 rounded border shadow-sm w-1/2">
+          <div className="bg-gray-200 px-2 py-3 border-solid border-gray-200 border-b">
+            Thêm sản phẩm
+          </div>
+          <div className="p-3">
+            <form className="w-full" onSubmit={handleAddProduct}>
+              <div className="flex flex-wrap -mx-3 mb-6">
+                <div className="w-full md:w-full px-3">
+                  <label
+                    className="block uppercase tracking-wide text-gray-700 text-xs font-light mb-1"
+                    htmlFor="grid-last-name"
+                  >
+                    Tên Sản Phẩm
+                  </label>
+                  <input
+                    className="appearance-none block w-full bg-gray-200 text-grey-darker border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white-500 focus:border-gray-600"
+                    id="grid-last-name"
+                    type="text"
+                    placeholder="Doe"
+                  />
+                </div>
+              </div>
+
+              <div className="-mx-3 mb-2">
+                <div className="w-full md:w-full px-3 mb-6 md:mb-[10px]">
+                  <label
+                    className="block uppercase tracking-wide text-grey-darker text-xs font-light mb-1"
+                    htmlFor="grid-city"
+                  >
+                    Giá sản phẩm
+                  </label>
+                  <input
+                    className="appearance-none block w-full bg-grey-200 text-grey-darker border border-grey-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-grey"
+                    id="grid-city"
+                    type="number"
+                  />
+                </div>
+                <div className="w-full md:w-full px-3 mb-6 md:mb-[10px]">
+                  <label
+                    className="block uppercase tracking-wide text-grey-darker text-xs font-light mb-1"
+                    htmlFor="grid-city"
+                  >
+                    Ảnh sản Phẩm
+                  </label>
+                  <input
+                    className="appearance-none block w-full bg-grey-200 text-grey-darker border border-grey-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-grey"
+                    id="inputGroupFile01"
+                    type="file"
+                    onChange={changeImage}
+                    style={{
+                      visibility: "hidden",
+                      position: "absolute",
+                      zIndex: "-999",
+                    }}
+                  />
+                  <Button icon={<UploadOutlined />}>
+                    <label
+                      htmlFor="inputGroupFile01"
+                      style={{ cursor: "pointer" }}
+                    >
+                      Tải ảnh lên
+                    </label>
+                    <img src={preview} alt="" width={100} />
+                  </Button>
+                </div>
+
+                <div className="w-full md:w-full px-3 mb-6 md:mb-[10px]">
+                  <label
+                    className="block uppercase tracking-wide text-grey-darker text-xs font-light mb-1"
+                    htmlFor="grid-state"
+                  >
+                    Loại Sản Phẩm
+                  </label>
+                  <div className="relative">
+                    <select
+                      className="block appearance-none w-full bg-grey-200 border border-grey-200 text-grey-darker py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-grey"
+                      id="grid-state"
+                    >
+                      <option>Bò</option>
+                      <option>Mỳ</option>
+                      <option>Pizza</option>
+                      <option>Bánh Mỳ</option>
+                      <option>Salad</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-grey-darker">
+                      <svg
+                        className="fill-current h-4 w-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div className="w-full md:w-full px-3 mb-6 md:mb-0">
+                  <label
+                    className="block uppercase tracking-wide text-grey-darker text-xs font-light mb-1"
+                    htmlFor="grid-zip"
+                  >
+                    Giới thiệu
+                  </label>
+                  <input
+                    className="appearance-none block w-full bg-grey-200 text-grey-darker border border-grey-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-grey"
+                    id="grid-zip"
+                    type="text"
+                    placeholder="ngon"
+                  />
+                </div>
+                <div>
+                  <button type="submit">Add</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+/////
+ <div className="flex flex-1  flex-col md:flex-row lg:flex-row mx-2">
+        <div className="mb-2 border-solid border-gray-300 rounded border shadow-sm w-1/2">
+          <div className="bg-gray-200 px-2 py-3 border-solid border-gray-200 border-b">
+            Thêm sản phẩm
+          </div>
+          <div className="p-3">
+            <form className="w-full" onSubmit={handleAddProduct}>
+              <div className="flex flex-wrap -mx-3 mb-6">
+                <div className="w-full md:w-full px-3">
+                  <label
+                    className="block uppercase tracking-wide text-gray-700 text-xs font-light mb-1"
+                    htmlFor="grid-last-name"
+                  >
+                    Tên Sản Phẩm
+                  </label>
+                  <input
+                    className="appearance-none block w-full bg-gray-200 text-grey-darker border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white-500 focus:border-gray-600"
+                    id="grid-last-name"
+                    type="text"
+                    placeholder="Doe"
+                  />
+                </div>
+              </div>
+
+              <div className="-mx-3 mb-2">
+                <div className="w-full md:w-full px-3 mb-6 md:mb-[10px]">
+                  <label
+                    className="block uppercase tracking-wide text-grey-darker text-xs font-light mb-1"
+                    htmlFor="grid-city"
+                  >
+                    Giá sản phẩm
+                  </label>
+                  <input
+                    className="appearance-none block w-full bg-grey-200 text-grey-darker border border-grey-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-grey"
+                    id="grid-city"
+                    type="number"
+                  />
+                </div>
+                <div className="w-full md:w-full px-3 mb-6 md:mb-[10px]">
+                  <label
+                    className="block uppercase tracking-wide text-grey-darker text-xs font-light mb-1"
+                    htmlFor="grid-city"
+                  >
+                    Ảnh sản Phẩm
+                  </label>
+                  <input
+                    className="appearance-none block w-full bg-grey-200 text-grey-darker border border-grey-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-grey"
+                    id="inputGroupFile01"
+                    type="file"
+                    onChange={changeImage}
+                    style={{
+                      visibility: "hidden",
+                      position: "absolute",
+                      zIndex: "-999",
+                    }}
+                  />
+                  <Button icon={<UploadOutlined />}>
+                    <label
+                      htmlFor="inputGroupFile01"
+                      style={{ cursor: "pointer" }}
+                    >
+                      Tải ảnh lên
+                    </label>
+                  </Button>
+                </div>
+                <img src={preview} alt="" width={100} />
+
+                <div className="w-full md:w-full px-3 mb-6 md:mb-0">
+                  <label
+                    className="block uppercase tracking-wide text-grey-darker text-xs font-light mb-1"
+                    htmlFor="grid-zip"
+                  >
+                    Giới thiệu
+                  </label>
+                  <input
+                    className="appearance-none block w-full bg-grey-200 text-grey-darker border border-grey-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-grey"
+                    id="grid-zip"
+                    type="text"
+                    placeholder="ngon"
+                  />
+                </div>
+                <div>
+                  <button type="submit">Add</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
